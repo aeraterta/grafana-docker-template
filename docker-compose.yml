@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: rak-grafana-db
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./data/influxdb_data:/var/lib/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: MyD3faultPassw0rd!
+      DOCKER_INFLUXDB_INIT_BUCKET: bucket
+      DOCKER_INFLUXDB_INIT_ORG: rakwireless
+
+  grafana:
+    build: .
+    container_name: rak-grafana-ui
+    ports:
+      - "5000:3000"
+    volumes:
+      - ./data/grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=MyD3faultPassw0rd!
+    depends_on:
+      - influxdb
+
+volumes:
+  influxdb_data:
+    external: true
+  grafana_data:
+    external: true
